@@ -11,7 +11,7 @@
       --gold: #ffb700;
       --red: #e62429;
       --dark-bg: #030a16;
-      --panel-bg: rgba(6, 20, 38, 0.85);
+      --panel-bg: rgba(6, 20, 38, 0.88);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,6 +33,65 @@
       background-size: 100% 100%, 30px 30px, 30px 30px;
     }
 
+    /* FULLSCREEN INTRO OVERLAY */
+    #intro-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% 50%, #0a192f 0%, #020c1b 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .intro-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 4px;
+      color: #fff;
+      text-shadow: 0 0 15px var(--cyan);
+      margin-bottom: 10px;
+    }
+
+    .intro-subtitle {
+      font-size: 1.1rem;
+      color: var(--gold);
+      letter-spacing: 2px;
+      margin-bottom: 35px;
+      text-transform: uppercase;
+    }
+
+    .start-btn {
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--cyan);
+      border: 2px solid var(--cyan);
+      padding: 16px 42px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      font-weight: bold;
+      text-transform: uppercase;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .start-btn:hover {
+      background: var(--cyan);
+      color: var(--dark-bg);
+      box-shadow: 0 0 35px var(--cyan);
+      transform: scale(1.05);
+    }
+
+    /* MAIN CONTAINER */
     .container {
       width: 90%;
       max-width: 650px;
@@ -43,6 +102,8 @@
       padding: 30px;
       text-align: center;
       backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 1s ease;
     }
 
     header h1 {
@@ -86,7 +147,6 @@
       transition: all 0.4s ease;
     }
 
-    /* LISTENING MODE: GOLD GLOW ANIMATION */
     .arc-reactor.listening {
       border-color: var(--gold);
       box-shadow: 0 0 25px var(--gold);
@@ -98,7 +158,6 @@
       box-shadow: 0 0 35px var(--gold), inset 0 0 20px var(--gold);
     }
 
-    /* SPEAKING / PROCESSING MODE: CYAN GLOW */
     .arc-reactor.speaking {
       border-color: var(--cyan);
       box-shadow: 0 0 30px var(--cyan);
@@ -146,6 +205,7 @@
       display: flex;
       gap: 15px;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
     button {
@@ -166,11 +226,27 @@
       color: var(--dark-bg);
       box-shadow: 0 0 15px var(--cyan);
     }
+
+    .hidden {
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <!-- INTRO SCREEN -->
+  <div id="intro-screen">
+    <div class="arc-reactor listening" style="margin-bottom: 20px;">
+      <div class="arc-core"></div>
+    </div>
+    <div class="intro-title">STARK INDUSTRIES PROTOCOL</div>
+    <div class="intro-subtitle">AI SYSTEM CREATED BY DARSHAN</div>
+    <button class="start-btn" onclick="initializeJarvisSystem()">INITIALIZE JARVIS</button>
+  </div>
+
+  <!-- MAIN INTERFACE -->
+  <div class="container" id="mainContainer">
     <header>
       <h1>J.A.R.V.I.S.</h1>
       <p>CREATED BY DARSHAN • AVENGERS AI PROTOCOL</p>
@@ -183,29 +259,48 @@
     <div class="status-text" id="statusText">SYSTEM STANDBY - CLICK TO LISTEN</div>
 
     <div class="dialog-box">
-      <div class="user-msg" id="userQuery"><b>You:</b> Click Arc Reactor to start mic...</div>
+      <div class="user-msg" id="userQuery"><b>You:</b> Click Arc Reactor to speak...</div>
       <div class="ai-msg" id="aiResponse"><b>J.A.R.V.I.S.:</b> Standby mode active, boss.</div>
     </div>
 
     <div class="btn-group">
       <button id="toggleBtn" onclick="toggleListening()">Toggle Microphone</button>
-      <button onclick="showCommands()">Supported Commands</button>
+      <button onclick="showCommands()">View All Commands</button>
     </div>
   </div>
 
   <script>
+    // EXTENDED MARVEL & AVENGERS KNOWLEDGE BASE
     const qaPairs = {
+      // CREATOR & SYSTEM Q&A
       "who created you": "I am J.A.R.V.I.S., an artificial intelligence vocal system created and developed by Darshan.",
       "who is your creator": "My creator is Darshan, who engineered my voice recognition and Avengers operational protocols.",
-      "who are you": "I am J.A.R.V.I.S., an artificial intelligence system created by Darshan.",
+      "who are you": "I am J.A.R.V.I.S., Just A Rather Very Intelligent System, created by Darshan.",
+      "what does jarvis stand for": "JARVIS stands for Just A Rather Very Intelligent System.",
+      
+      // IRON MAN & STARK ENTERPRISES
       "who is iron man": "Iron Man is Tony Stark, a genius billionaire, playboy, and philanthropist in powered armor.",
+      "who is tony stark": "Tony Stark is the CEO of Stark Industries, creator of the Arc Reactor, and the armored Avenger known as Iron Man.",
+      "what is the arc reactor": "The Arc Reactor is a clean-energy fusion power source originally created by Howard Stark and miniaturized by Tony Stark.",
+      "what is mark 85": "The Mark 85 is Tony Stark's final and most advanced Iron Man armor, constructed with flexible nanotechnology.",
+
+      // AVENGERS CHARACTERS
       "who is captain america": "Captain America is Steve Rogers, a World War II super-soldier wielding an indestructible vibranium shield.",
       "who is thor": "Thor Odinson is the Asgardian God of Thunder, former wielder of Mjolnir and Stormbreaker.",
-      "who is the strongest avenger": "According to system records, Thor or Wanda Maximoff hold the highest power levels among the Avengers.",
+      "who is hulk": "The Hulk is Dr. Bruce Banner, a brilliant scientist who transforms into a gamma-powered monster when enraged.",
+      "who is spider man": "Spider-Man is Peter Parker, a high school hero with spider-like agility, web shooters, and a spider-sense.",
+      "who is doctor strange": "Doctor Stephen Strange is the Master of the Mystic Arts and former Sorcerer Supreme.",
+      "who is black panther": "King T'Challa is the Black Panther, protector and ruler of the technologically advanced nation of Wakanda.",
+      "who is vision": "Vision is a synthetic vibranium android created by Tony Stark, Bruce Banner, and the Mind Stone.",
+      "who is ultron": "Ultron is a rogue artificial intelligence created to bring world peace, which mistakenly concluded humanity must be eradicated.",
+
+      // POWER SCALING & MARVEL LORE
+      "who is the strongest avenger": "According to system records, Thor, Wanda Maximoff, and Captain Marvel hold the highest power output levels among the Avengers.",
       "what are the infinity stones": "The six Infinity Stones are Space, Mind, Reality, Power, Time, and Soul.",
       "who is thanos": "Thanos is the Mad Titan who sought all six Infinity Stones to erase half of all life in the universe.",
+      "what is vibranium": "Vibranium is a rare, indestructible alien metal found in Wakanda that absorbs kinetic energy.",
       "avengers assemble": "Command recognized. Activating all Avengers defensive protocols, boss.",
-      "hello": "Greetings, boss. I am J.A.R.V.I.S., created by Darshan. Say 'Hey Jarvis' followed by your command."
+      "hello": "Greetings, boss! I am J.A.R.V.I.S., created by Darshan. Say 'Hey Jarvis' followed by your command."
     };
 
     const statusText = document.getElementById('statusText');
@@ -213,10 +308,18 @@
     const aiResponseEl = document.getElementById('aiResponse');
     const arcReactor = document.getElementById('arcReactor');
     const toggleBtn = document.getElementById('toggleBtn');
+    const mainContainer = document.getElementById('mainContainer');
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition;
     let isListening = false;
+
+    // PRELOAD SPEECH VOICES (MOBILE / CHROME FIX)
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
 
     if (SpeechRecognition) {
       recognition = new SpeechRecognition();
@@ -276,6 +379,21 @@
       statusText.innerText = "MUST USE GOOGLE CHROME OR MS EDGE ON DESKTOP.";
     }
 
+    function initializeJarvisSystem() {
+      // 1. Hide Intro Screen & Reveal Main UI
+      const introScreen = document.getElementById('intro-screen');
+      introScreen.classList.add('hidden');
+      mainContainer.style.opacity = '1';
+
+      // 2. Play Welcome Speech
+      const welcomeText = "Hello, I am J.A.R.V.I.S., created by Darshan. All systems are fully operational and standing by, boss.";
+      aiResponseEl.innerHTML = `<b>J.A.R.V.I.S.:</b> ${welcomeText}`;
+      
+      setTimeout(() => {
+        speakResponse(welcomeText);
+      }, 300);
+    }
+
     function toggleListening() {
       if (!recognition) return;
 
@@ -291,7 +409,7 @@
         isListening = true;
         recognition.start();
       } catch (e) {
-        console.log("Already started");
+        console.log("Recognition already running");
       }
     }
 
@@ -334,7 +452,7 @@
         if (matchedKey) {
           responseText = qaPairs[matchedKey];
         } else {
-          responseText = "I couldn't find that in the database, boss. Try asking 'Who created you', 'What is the time', or 'Who is Iron Man'.";
+          responseText = "I couldn't find that in the Stark database, boss. Try asking 'Who created you', 'Who is Iron Man', or 'What are the infinity stones'.";
         }
       }
 
@@ -346,8 +464,15 @@
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.0;
-        utterance.pitch = 0.9;
+        utterance.rate = 0.95;
+        utterance.pitch = 0.95;
+
+        // Select suitable English voice
+        const voices = window.speechSynthesis.getVoices();
+        const selectedVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('David')));
+        if (selectedVoice) {
+          utterance.voice = selectedVoice;
+        }
 
         utterance.onstart = () => {
           setVisualState('speaking');
@@ -364,15 +489,18 @@
 
     function showCommands() {
       const commands = [
-        "Hey Jarvis, who created you?",
-        "Hey Jarvis, what's the time?",
-        "Hey Jarvis, what's the date?",
-        "Hey Jarvis, who is Iron Man?",
-        "Hey Jarvis, who is Captain America?",
-        "Hey Jarvis, who is Thor?",
-        "Hey Jarvis, who is Thanos?"
+        "• Who created you?",
+        "• What does JARVIS stand for?",
+        "• Who is Iron Man / Tony Stark?",
+        "• What is the Arc Reactor?",
+        "• Who is Captain America / Thor / Hulk?",
+        "• Who is Spider-Man / Doctor Strange?",
+        "• Who is Vision / Ultron / Thanos?",
+        "• What are the Infinity Stones?",
+        "• What is Vibranium?",
+        "• What's the time / date?"
       ];
-      alert("Supported Commands:\n\n" + commands.join("\n"));
+      alert("Available Voice Commands:\n\n" + commands.join("\n"));
     }
   </script>
 </body>
